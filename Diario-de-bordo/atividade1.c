@@ -1,3 +1,5 @@
+// Aluna: Maria Eduarda Santos Pereira CC6N
+
 #include <stdio.h>
 #include <stdlib.h>
 
