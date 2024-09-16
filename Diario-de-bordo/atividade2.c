@@ -1,3 +1,5 @@
+// Aluna: Maria Eduarda Santos Pereira CC6N - Segunda atividade
+
 #include <stdio.h>
 #include <stdlib.h>
 
