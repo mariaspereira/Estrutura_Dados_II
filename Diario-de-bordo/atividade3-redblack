@@ -1,0 +1,170 @@
+// Aluna: Maria Eduarda Santos Pereira CC6N
+
+#include <stdio.h>
+#include <stdlib.h>
+
+enum Cor { VERMELHO, PRETO };
+
+typedef struct No {
+    int valor;
+    enum Cor cor;
+    struct No *esquerda, *direita, *pai;
+} No;
+
+// Função para criar um novo nó
+No* criarNo(int valor) {
+    No* novoNo = (No*) malloc(sizeof(No));
+    novoNo->valor = valor;
+    novoNo->cor = VERMELHO; // Todo novo nó começa como vermelho
+    novoNo->esquerda = novoNo->direita = novoNo->pai = NULL;
+    return novoNo;
+}
+
+// Rotação à esquerda
+No* rotacaoEsquerda(No* raiz, No* no) {
+    No* direita = no->direita;
+    no->direita = direita->esquerda;
+    
+    if (direita->esquerda != NULL) {
+        direita->esquerda->pai = no;
+    }
+    
+    direita->pai = no->pai;
+    
+    if (no->pai == NULL) {
+        raiz = direita;
+    } else if (no == no->pai->esquerda) {
+        no->pai->esquerda = direita;
+    } else {
+        no->pai->direita = direita;
+    }
+    
+    direita->esquerda = no;
+    no->pai = direita;
+    
+    return raiz;
+}
+
+// Rotação à direita
+No* rotacaoDireita(No* raiz, No* no) {
+    No* esquerda = no->esquerda;
+    no->esquerda = esquerda->direita;
+    
+    if (esquerda->direita != NULL) {
+        esquerda->direita->pai = no;
+    }
+    
+    esquerda->pai = no->pai;
+    
+    if (no->pai == NULL) {
+        raiz = esquerda;
+    } else if (no == no->pai->direita) {
+        no->pai->direita = esquerda;
+    } else {
+        no->pai->esquerda = esquerda;
+    }
+    
+    esquerda->direita = no;
+    no->pai = esquerda;
+    
+    return raiz;
+}
+
+// Função para corrigir violações da Árvore Red-Black após inserção
+No* ajustarInsercao(No* raiz, No* no) {
+    while (no->pai != NULL && no->pai->cor == VERMELHO) {
+        if (no->pai == no->pai->pai->esquerda) {
+            No* tio = no->pai->pai->direita;
+            
+            if (tio != NULL && tio->cor == VERMELHO) {
+                no->pai->cor = PRETO;
+                tio->cor = PRETO;
+                no->pai->pai->cor = VERMELHO;
+                no = no->pai->pai;
+            } else {
+                if (no == no->pai->direita) {
+                    no = no->pai;
+                    raiz = rotacaoEsquerda(raiz, no);
+                }
+                no->pai->cor = PRETO;
+                no->pai->pai->cor = VERMELHO;
+                raiz = rotacaoDireita(raiz, no->pai->pai);
+            }
+        } else {
+            No* tio = no->pai->pai->esquerda;
+            
+            if (tio != NULL && tio->cor == VERMELHO) {
+                no->pai->cor = PRETO;
+                tio->cor = PRETO;
+                no->pai->pai->cor = VERMELHO;
+                no = no->pai->pai;
+            } else {
+                if (no == no->pai->esquerda) {
+                    no = no->pai;
+                    raiz = rotacaoDireita(raiz, no);
+                }
+                no->pai->cor = PRETO;
+                no->pai->pai->cor = VERMELHO;
+                raiz = rotacaoEsquerda(raiz, no->pai->pai);
+            }
+        }
+    }
+    
+    raiz->cor = PRETO; // A raiz sempre deve ser preta
+    return raiz;
+}
+
+// Função para inserir um novo nó na Árvore Red-Black
+No* inserir(No* raiz, int valor) {
+    No* novoNo = criarNo(valor);
+    No* pai = NULL;
+    No* atual = raiz;
+    
+    while (atual != NULL) {
+        pai = atual;
+        if (valor < atual->valor) {
+            atual = atual->esquerda;
+        } else {
+            atual = atual->direita;
+        }
+    }
+    
+    novoNo->pai = pai;
+    
+    if (pai == NULL) {
+        raiz = novoNo; // A árvore estava vazia
+    } else if (valor < pai->valor) {
+        pai->esquerda = novoNo;
+    } else {
+        pai->direita = novoNo;
+    }
+    
+    // Corrigir violações
+    raiz = ajustarInsercao(raiz, novoNo);
+    
+    return raiz;
+}
+
+// Função para fazer a travessia em ordem da árvore
+void emOrdem(No* raiz) {
+    if (raiz != NULL) {
+        emOrdem(raiz->esquerda);
+        printf("%d ", raiz->valor);
+        emOrdem(raiz->direita);
+    }
+}
+
+int main() {
+    No* raiz = NULL;
+    
+    raiz = inserir(raiz, 10);
+    raiz = inserir(raiz, 20);
+    raiz = inserir(raiz, 30);
+    raiz = inserir(raiz, 15);
+    
+    printf("Travessia em ordem: ");
+    emOrdem(raiz);
+    printf("\n");
+    
+    return 0;
+}
