@@ -1,4 +1,4 @@
-Aluna: Maria Eduarda Santos Pereira CC6N
+Aluna: Maria Eduarda Santos Pereira Turma: CC6N
 
 #include <stdio.h>
 #include <stdlib.h>
